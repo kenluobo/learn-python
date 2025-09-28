@@ -1,0 +1,71 @@
+#ifndef TABLE_H
+#define TABLE_H
+
+#include <exception>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+
+using StringVector = std::vector<std::string>;
+
+struct  TableItem {
+  TableItem() = default;
+
+  TableItem(const char *keyId, const char *csv) {
+    if (!keyId || !csv) {
+      return;
+    }
+
+    init(keyId, csv);
+  }
+
+  virtual ~TableItem() = default;
+
+  virtual std::string get_as_string() const {
+    std::string ret;
+    unsigned count = 0;
+    ret.append("\n");
+    ret.append("{key: ");
+    ret.append(keyId);
+    ret.append("}, ");
+    ret.append("{value: [");
+    for (const std::string &elem : dataVec) {
+      ret.append(elem);
+      if (++count < dataVec.size()) {
+        ret.append(", ");
+      }
+    }
+    ret.append("]}\n");
+
+    return ret;
+  }
+
+ protected:
+  virtual void fill_data() = 0;
+
+  void init(const char *keyId, const char *csv) {
+    this->keyId = std::string(keyId);
+    this->csv = std::string(csv);
+    dataVec = parse_csv(csv);
+  }
+
+  std::vector<std::string> parse_csv(const char *csv) {
+    StringVector dataVec;
+    std::istringstream iss(csv);
+    std::string field;
+    while (std::getline(iss, field, ',')) {
+      dataVec.emplace_back(field);
+    }
+    
+    return dataVec;
+  }
+
+ protected:
+  std::string keyId;
+  StringVector dataVec;
+public:
+  std::string csv;
+};
+
+#endif
