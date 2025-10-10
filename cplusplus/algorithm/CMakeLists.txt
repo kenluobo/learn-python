@@ -19,3 +19,5 @@ if (ENABLE_TEST)
     message(STATUS "Enable test case")
     add_subdirectory(test)
 endif ()
+
+add_subdirectory(lib)
